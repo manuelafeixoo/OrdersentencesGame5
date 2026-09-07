@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arrange the sentence 5</title>
+    <style>
+        /* Base Kid-Friendly Styles */
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Nunito', sans-serif;
+            background-color: #f4f9ff;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            color: #ff8b94;
+            text-shadow: 2px 2px 0px #ffe1e4;
+            margin: 5px 0 10px 0;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #555;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .score-counter {
+            background: #baffc9;
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 2px solid #82d495;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        /* Word Bank Area */
+        .word-bank {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            background-color: #e0f7fa;
+            border: 4px dashed #81d4fa;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+        }
+
+        .word-bank::before {
+            content: 'Word Bank (Drag or Click words)';
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            color: #81d4fa;
+            font-weight: bold;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        /* Drop Zone (Sentence Area) */
+        .drop-zone {
+            min-height: 80px;
+            background-color: #fff9c4;
+            border: 4px dashed #fff176;
+            border-radius: 20px;
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+            transition: background-color 0.3s;
+        }
+
+        .drop-zone.drag-over {
+            background-color: #fffae6;
+            border-color: #ffeb3b;
+        }
+
+        /* Word Cards */
+        .word-card {
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #444;
+            cursor: pointer; 
+            user-select: none;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+            transition: transform 0.1s;
+            touch-action: manipulation; 
+        }
+
+        .word-card:active {
+            transform: scale(0.95);
+        }
+
+        .word-card.dragging {
+            opacity: 0.5;
+            box-shadow: none;
+        }
+
+        /* State classes for words */
+        .in-bank {
+            position: absolute;
+            top: 0;
+            left: 0;
+            will-change: transform;
+        }
+
+        .in-drop-zone {
+            position: relative;
+            transform: none !important;
+            top: auto;
+            left: auto;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.15);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        button:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 rgba(0,0,0,0.15);
+        }
+
+        .btn-check { background-color: #baffc9; color: #2e7d32; }
+        .btn-reset { background-color: #ffdfba; color: #e65100; }
+        .btn-next { background-color: #bae1ff; color: #0d47a1; display: none; }
+
+        .feedback {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            min-height: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Sentence Scramble 5</h1>
+    
+    <div class="stats-bar">
+        <div>Level: <span id="level-display">1</span>/10</div>
+        <div class="score-counter">Score: <span id="score-display">0</span></div>
+    </div>
+
+    <div class="game-container">
+        <div class="word-bank" id="word-bank"></div>
+        <div class="drop-zone" id="drop-zone"></div>
+        <div class="feedback" id="feedback"></div>
+
+        <div class="controls">
+            <button class="btn-reset" id="btn-reset">↺ Reset</button>
+            <button class="btn-check" id="btn-check">✓ Check Answer</button>
+            <button class="btn-next" id="btn-next">Next Level ➔</button>
+        </div>
+    </div>
+
+    <script>
+        // Array exacto con las oraciones del nuevo PDF (YEAR 5)
+        const allSentences = [
+            // Página 500
+            "When's your birthday?", "My birthday is on the 20th of April.", "Where are you from?", 
+            "I'm from Paris, in France.", "What languages do you speak?", "I speak a little bit of English.", 
+            "Where does she live?", "I live in a small town in England.", "Who do you live with?", 
+            "I live with my aunt Mary.", "What do you look like?", "I've got blue eyes and curly hair.", 
+            "What time do you go home?", "I go home at quarter past three.", "What do you like to do at home?", 
+            "I like playing video games and surfing the internet.", "When is the school trip?", 
+            "The museum trip is on 17th September", "When's the football match?", "When's the Halloween party?", 
+            "It's on the 31st of October",
+
+            // Página 501
+            "What languages do they speak?", "They speak Italian and French", "How many languages does she speak?", 
+            "She speaks four languages", "Where is your brother from?", "He is from Morocco", "They are from Russia", 
+            "Are they Japanese? Yes, they are", "What's its typical food?", "Does he like China? Yes, he does", 
+            "Where does she live?", "She lives in a flat in London", "What colour is the German flag?", 
+            "What's the typical sport of your country?", "British people have lunch at twelve o'clock", 
+            "What's the weather like in Sweden?", "What continent is Brazil in?", "What time is in the USA now?", 
+            "My summer holidays are in July and August.", "What time does their school start?", 
+            "Their school day starts at eight o'clock", "I walk to school with my brother and sister.", 
+            "We go home at half past three.", "They're on holiday in India.",
+
+            // Página 502
+            "I'm on the football team.", "At the weekend, I walk the dog and do crafts.", 
+            "Saturday is my favourite day of the week.", "At night, I like reading in bed.", 
+            "I sometimes meet friends at the park at half past six.", 
+            "After lunch, I always go to football training.", 
+            "My dad hardly ever does gardening.", "We always visit my grandparents on Sunday.", 
+            "In the evening, my brother sometimes goes to the cinema with his friends.", 
+            "After breakfast, my parents do the shopping.", "At the weekend, I like using internet.", 
+            "In the morning, my sister practises the keyboard for an hour.", "He always has dinner at eight o'clock.", 
+            "You hardly ever do baking at the weekend.", "My cousins never have lunch with their parents.", 
+            "We usually ride our bikes on Sunday morning.", 
+            "My uncle never watches TV at night.", 
+            "How often do you go to training?", "How often do you watch TV? Twice a week.", 
+            "I walk the dog four times a week", "On Sunday, I hardly ever get up early.", 
+            "She goes basketball training three times a week.",
+
+            // Página 503
+            "My favourite genre is fantasy", "I like reading detective stories", 
+            "I read every night before going to bed", 
+            "My friends don't like science fiction", 
+            "I'm a big fan of the Harry Potter books", "Do you like stories about pirates?", 
+            "I really like reading horror stories about ghosts", "I love biographies about kings and queens.", 
+            "She goes to the cinema twice a month", "I watch films on TV or on the computer", 
+            "My cousin love historical films", "I visit the library once a week", 
+            "I think adventure films are exciting.", "My favourite film is an animation film called Coco", 
+            "The special effects are stunning", 
+            "I hate drama films, I think they are rubbish", "It's a book about a boy called Auggie.", 
+            "It's a good film, it's sad and moving.", "My favourite place to read is in bed", 
+            "My favourite time to read is in the afternoon", "My friend Petra quite likes animation", 
+            "The characters are two girls and a robot", "This film is hilarious and there's lots of action",
+
+            // Página 504
+            "Cheetahs and leopards are carnivores", "Cheetahs hunt during the day and sleep at night.", 
+            "An elephant is more social than a leopard", "Hippos and rhinos are big herbivores", 
+            "Hippos are more dangerous to humans than rhinos.", "Chimps have got big ears and long fingers.", 
+            "Baboons are smaller than chimps", "Camels are slower than zebras", 
+            "A hippo is more aggressive than an elephant.", "Giraffes are taller than humans", 
+            "Gorillas have got stronger arms than kangaroos", "Dogs have got shorter legs than horses", 
+            "Monkeys have got longer tails than rabbits", "Cheetahs have got smaller legs than rhinos", 
+            "Hippos have got smaller ears than elephants", "Camels have got longer legs than leopards", 
+            "Humans have got bigger noses than chimps", "Dogs have got longer fur than cats", 
+            "An ostrich can run faster than a human", "Okapis have got stripes on their legs", 
+            "Jerboas have got four legs and a tail.",
+
+            // Página 505
+            "My mother was good at Music", "Peter was a scary teacher.", "Were you good at Maths? No, I wasn't", 
+            "I was good at singing and playing the guitar.", 
+            "She wasn't good at Science or Maths.", 
+            "Joel was bad at English and Art.", "Science lessons were difficult for me.", 
+            "What was her favourite subject?", "She was in the school gymnastics team.", 
+            "Were you sporty? Yes, I was", "Was he lazy? No, he wasn't", "My uncle was good at telling jokes", 
+            "My dad was really talkative and funny.", 
+            "My mum was quiet and hard-working at school.", "My uncle was sporty and friendly.", 
+            "My granny was never good at football", "What was your favourite school lunch?", 
+            "Who was your teacher in Year 1?", "At my school, there was a music room and a gym.", 
+            "There wasn't a computer room or a laboratory.", "He was not very artistic.", 
+            "Was there a teacher's room in your school?", "There weren't any girls in my school", 
+            "There were lots of books in the library",
+
+            // Página 506
+            "My parents studied Science every day.", "We didn't study Maths on Tuesday.", 
+            "We watched videos about the planets.", "Our teacher showed us a drone.", 
+            "There was a solar panel on the drone.", "The students designed a bridge last month.", 
+            "They visited the science museum three days ago.", 
+            "I listened to some relaxing music with my headphones.", 
+            "Did she design a dishwasher?", "She didn't use a drone three days ago.", 
+            "In the 1980s, mobile phones were big", "A Japanese inventor invented the walkman", 
+            "He played with a Rubik's cube when he was a child.", "Steve Jobs was born in 1955.", 
+            "He helped to invent the first smartphone.", "I was born in 1939", 
+            "Children didn't use mobile phones at school.", "Paul didn't work with his friend", 
+            "What did she film?", "Where did he work?", "When did she use the computer?", 
+            "I used the remote control to turn on the TV.", "My dad cooked the food in the microwave", 
+            "Did he play computer games last weekend?", "My brother didn't talk to me yesterday."
+        ];
+        
+        const pastelColors = ['#ffb3ba', '#ffdfba', '#ffffba', '#baffc9', '#bae1ff', '#e8b9ff', '#ffd1dc'];
+        
+        let currentSessionSentences = [];
+        let currentLevel = 0;
+        let score = 0;
+        let wordsData = []; 
+        let animationFrameId;
+
+        const wordBank = document.getElementById('word-bank');
+        const dropZone = document.getElementById('drop-zone');
+        const feedback = document.getElementById('feedback');
+        const btnCheck = document.getElementById('btn-check');
+        const btnReset = document.getElementById('btn-reset');
+        const btnNext = document.getElementById('btn-next');
+        const levelDisplay = document.getElementById('level-display');
+        const scoreDisplay = document.getElementById('score-display');
+
+        function shuffleArray(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function startNewGame() {
+            const shuffled = shuffleArray([...allSentences]);
+            currentSessionSentences = shuffled.slice(0, 10);
+            
+            currentLevel = 0;
+            score = 0;
+            scoreDisplay.innerText = score;
+            
+            const replayBtn = document.getElementById('btn-replay');
+            if (replayBtn) replayBtn.remove();
+
+            btnReset.style.display = 'inline-block';
+            initLevel();
+        }
+
+        function initLevel() {
+            wordBank.innerHTML = '';
+            dropZone.innerHTML = '';
+            feedback.innerText = '';
+            btnNext.style.display = 'none';
+            btnCheck.style.display = 'inline-block';
+            levelDisplay.innerText = currentLevel + 1;
+            wordsData = [];
+
+            const sentence = currentSessionSentences[currentLevel];
+            const words = sentence.split(' ').sort(() => Math.random() - 0.5);
+
+            const bankRect = wordBank.getBoundingClientRect();
+
+            words.forEach((word, index) => {
+                const el = document.createElement('div');
+                el.className = 'word-card in-bank';
+                el.id = 'word-' + index;
+                el.draggable = true;
+                el.innerText = word;
+                
+                el.style.backgroundColor = pastelColors[index % pastelColors.length];
+                
+                el.addEventListener('dragstart', handleDragStart);
+                el.addEventListener('dragend', handleDragEnd);
+                el.addEventListener('click', handleWordClick);
+
+                wordBank.appendChild(el);
+
+                const width = el.offsetWidth;
+                const height = el.offsetHeight;
+                
+                const x = Math.random() * Math.max(1, bankRect.width - width);
+                const y = Math.random() * Math.max(1, bankRect.height - height);
+                
+                const speedMulti = 0.8 + Math.random() * 1.0; 
+                const vx = (Math.random() > 0.5 ? 1 : -1) * speedMulti;
+                const vy = (Math.random() > 0.5 ? 1 : -1) * speedMulti;
+
+                wordsData.push({ id: el.id, el, x, y, vx, vy, width, height });
+            });
+
+            if (!animationFrameId) {
+                animate();
+            }
+        }
+
+        function animate() {
+            const bankRect = wordBank.getBoundingClientRect();
+
+            wordsData.forEach(w => {
+                if (w.el.parentElement !== wordBank || w.el.dataset.dragging === 'true') {
+                    return;
+                }
+
+                w.x += w.vx;
+                w.y += w.vy;
+
+                if (w.x <= 0) { 
+                    w.x = 0; 
+                    w.vx = Math.abs(w.vx); 
+                }
+                if (w.y <= 0) { 
+                    w.y = 0; 
+                    w.vy = Math.abs(w.vy); 
+                }
+                if (w.x + w.width >= bankRect.width) { 
+                    w.x = Math.max(0, bankRect.width - w.width); 
+                    w.vx = -Math.abs(w.vx); 
+                }
+                if (w.y + w.height >= bankRect.height) { 
+                    w.y = Math.max(0, bankRect.height - w.height); 
+                    w.vy = -Math.abs(w.vy); 
+                }
+
+                w.el.style.transform = `translate(${w.x}px, ${w.y}px)`;
+            });
+
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        function handleWordClick(e) {
+            const el = e.target;
+            
+            if (el.parentElement === wordBank) {
+                dropZone.appendChild(el);
+                el.className = 'word-card in-drop-zone';
+                el.style.transform = 'none';
+            } 
+            else if (el.parentElement === dropZone) {
+                wordBank.appendChild(el);
+                el.className = 'word-card in-bank';
+                
+                const data = wordsData.find(w => w.id === el.id);
+                if (data) {
+                    const bankRect = wordBank.getBoundingClientRect();
+                    data.x = (bankRect.width / 2) - (data.width / 2);
+                    data.y = (bankRect.height / 2) - (data.height / 2);
+                }
+            }
+        }
+
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.id);
+            e.target.dataset.dragging = 'true';
+            setTimeout(() => e.target.classList.add('dragging'), 0);
+        }
+
+        function handleDragEnd(e) {
+            e.target.dataset.dragging = 'false';
+            e.target.classList.remove('dragging');
+        }
+
+        dropZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            
+            const id = e.dataTransfer.getData('text/plain');
+            const el = document.getElementById(id);
+            
+            if (el) {
+                const afterElement = getDragAfterElement(dropZone, e.clientX);
+                if (afterElement == null) {
+                    dropZone.appendChild(el);
+                } else {
+                    dropZone.insertBefore(el, afterElement);
+                }
+
+                el.className = 'word-card in-drop-zone';
+                el.style.transform = 'none';
+            }
+        });
+
+        wordBank.addEventListener('dragover', e => {
+            e.preventDefault();
+        });
+
+        wordBank.addEventListener('drop', e => {
+            e.preventDefault();
+            const id = e.dataTransfer.getData('text/plain');
+            const el = document.getElementById(id);
+            
+            if (el && el.parentElement !== wordBank) {
+                wordBank.appendChild(el);
+                el.className = 'word-card in-bank';
+                
+                const data = wordsData.find(w => w.id === id);
+                if (data) {
+                    const rect = wordBank.getBoundingClientRect();
+                    data.x = e.clientX - rect.left - (data.width / 2);
+                    data.y = e.clientY - rect.top - (data.height / 2);
+                }
+            }
+        });
+
+        function getDragAfterElement(container, x) {
+            const draggableElements = [...container.querySelectorAll('.word-card:not(.dragging)')];
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = x - box.left - box.width / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        btnCheck.addEventListener('click', () => {
+            const droppedWords = Array.from(dropZone.querySelectorAll('.word-card'));
+            const currentAnswer = droppedWords.map(w => w.innerText).join(' ');
+            const correctAnswer = currentSessionSentences[currentLevel];
+
+            if (currentAnswer === correctAnswer) {
+                feedback.innerText = "🌟 Great Job! That's correct! 🌟";
+                feedback.style.color = "#2e7d32";
+                
+                score += 10;
+                scoreDisplay.innerText = score;
+                
+                btnCheck.style.display = 'none';
+                btnNext.style.display = 'inline-block';
+            } else {
+                feedback.innerText = "Oops! That's not quite right. Try again!";
+                feedback.style.color = "#d32f2f";
+            }
+        });
+
+        btnReset.addEventListener('click', () => {
+            wordsData.forEach(w => {
+                if (w.el.parentElement !== wordBank) {
+                    wordBank.appendChild(w.el);
+                    w.el.className = 'word-card in-bank';
+                    
+                    const bankRect = wordBank.getBoundingClientRect();
+                    w.x = (bankRect.width / 2) - (w.width / 2);
+                    w.y = (bankRect.height / 2) - (w.height / 2);
+                }
+            });
+            feedback.innerText = "";
+        });
+
+        btnNext.addEventListener('click', () => {
+            currentLevel++;
+            if (currentLevel < currentSessionSentences.length) {
+                initLevel();
+            } else {
+                wordBank.innerHTML = '';
+                dropZone.innerHTML = '';
+                feedback.innerText = "🎉 You completed all 10 levels! 🎉";
+                feedback.style.color = "#ff4081";
+                btnNext.style.display = 'none';
+                btnCheck.style.display = 'none';
+                btnReset.style.display = 'none';
+                
+                const replayBtn = document.createElement('button');
+                replayBtn.className = 'btn-check';
+                replayBtn.id = 'btn-replay';
+                replayBtn.innerText = 'Play Again';
+                replayBtn.onclick = startNewGame;
+                
+                document.querySelector('.controls').appendChild(replayBtn);
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            const bankRect = wordBank.getBoundingClientRect();
+            wordsData.forEach(w => {
+                if (w.x + w.width > bankRect.width) w.x = Math.max(0, bankRect.width - w.width);
+                if (w.y + w.height > bankRect.height) w.y = Math.max(0, bankRect.height - w.height);
+            });
+        });
+
+        startNewGame();
+    </script>
+</body>
+</html>
