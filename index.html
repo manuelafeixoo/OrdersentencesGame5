@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrange the sentence 5</title>
+    <title>Sentence Scramble 5 - Complete Edition</title>
     <style>
         /* Base Kid-Friendly Styles */
         body {
@@ -17,7 +17,7 @@
             align-items: center;
             box-sizing: border-box;
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow-x: hidden; 
         }
 
         h1 {
@@ -28,12 +28,118 @@
             text-align: center;
         }
 
-        .stats-bar {
+        /* Setup Screen */
+        .setup-screen {
             display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            background: white;
+            padding: 25px;
+            border-radius: 25px;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.1);
+            margin-top: 10px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .config-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .config-label {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .mode-btn {
+            padding: 8px 15px;
+            border: 3px solid #81d4fa;
+            background: white;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            color: #0d47a1;
+        }
+
+        .mode-btn.selected {
+            background: #baffc9;
+            border-color: #2e7d32;
+        }
+
+        .player-setup-box {
+            background: #f0f7ff;
+            border: 3px solid #bae1ff;
+            border-radius: 20px;
+            padding: 12px;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .player-setup-box input {
+            padding: 6px 10px;
+            font-size: 1rem;
+            border: 2px solid #81d4fa;
+            border-radius: 10px;
+            width: 80%;
+            font-family: inherit;
+            text-align: center;
+        }
+
+        .avatar-selector {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .avatar-option {
+            font-size: 1.3rem;
+            padding: 3px 5px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.1s;
+        }
+
+        .avatar-option:hover {
+            transform: scale(1.1);
+        }
+
+        .avatar-option.selected {
+            background: #baffc9;
+            border-color: #2e7d32;
+            transform: scale(1.15);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: none;
             justify-content: space-between;
+            align-items: center;
             width: 100%;
             max-width: 800px;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             font-size: 1.1rem;
             font-weight: bold;
             color: #555;
@@ -41,17 +147,46 @@
             box-sizing: border-box;
         }
 
+        .timer-display {
+            background: #ffebee;
+            color: #c62828;
+            padding: 3px 12px;
+            border-radius: 15px;
+            border: 2px solid #ef9a9a;
+            display: none;
+        }
+
+        .scores-container {
+            display: flex;
+            gap: 15px;
+        }
+
         .score-counter {
-            background: #baffc9;
-            padding: 5px 15px;
-            border-radius: 20px;
-            border: 2px solid #82d495;
+            background: #f1f1f1;
+            padding: 8px 18px;
+            border-radius: 25px;
+            border: 3px solid #ccc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+            opacity: 0.7;
+            transform: scale(0.95);
+            transition: all 0.3s ease;
+        }
+
+        .score-counter.active-player {
+            background: #fff9c4;
+            border-color: #fbc02d;
+            box-shadow: 0 0 15px rgba(251, 192, 45, 0.6);
+            opacity: 1;
+            transform: scale(1.1);
         }
 
         .game-container {
+            display: none;
             width: 100%;
             max-width: 800px;
-            display: flex;
             flex-direction: column;
             gap: 10px;
             padding: 0 10px;
@@ -62,7 +197,7 @@
         .word-bank {
             position: relative;
             width: 100%;
-            height: 220px;
+            height: 200px; 
             background-color: #e0f7fa;
             border: 4px dashed #81d4fa;
             border-radius: 20px;
@@ -83,7 +218,7 @@
 
         /* Drop Zone (Sentence Area) */
         .drop-zone {
-            min-height: 80px;
+            min-height: 80px; 
             background-color: #fff9c4;
             border: 4px dashed #fff176;
             border-radius: 20px;
@@ -125,7 +260,6 @@
             box-shadow: none;
         }
 
-        /* State classes for words */
         .in-bank {
             position: absolute;
             top: 0;
@@ -146,15 +280,15 @@
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 12px;
             margin-top: 5px;
         }
 
         button {
-            padding: 10px 20px;
+            padding: 10px 18px;
             border: none;
             border-radius: 25px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-family: inherit;
             font-weight: bold;
             cursor: pointer;
@@ -169,39 +303,107 @@
 
         .btn-check { background-color: #baffc9; color: #2e7d32; }
         .btn-reset { background-color: #ffdfba; color: #e65100; }
+        .btn-skip { background-color: #e0e0e0; color: #616161; }
+        .btn-help { background-color: #fff59d; color: #f57f17; }
+        .btn-home { background-color: #ffcdd2; color: #b71c1c; }
         .btn-next { background-color: #bae1ff; color: #0d47a1; display: none; }
+        .btn-start { background-color: #baffc9; color: #2e7d32; font-size: 1.2rem; padding: 10px 25px; }
 
         .feedback {
             text-align: center;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: bold;
-            min-height: 30px;
+            min-height: 25px;
         }
     </style>
 </head>
 <body>
 
     <h1>Sentence Scramble 5</h1>
+
+    <!-- Setup Screen -->
+    <div class="setup-screen" id="setup-screen">
+        <h2>Game Settings</h2>
+        
+        <div class="config-section">
+            <span class="config-label">Players Mode:</span>
+            <div class="mode-selector">
+                <button class="mode-btn selected" id="mode-single" onclick="setGameMode(1)">1 Player 👤</button>
+                <button class="mode-btn" id="mode-multi" onclick="setGameMode(2)">2 Players 👥</button>
+            </div>
+        </div>
+
+        <div class="config-section">
+            <span class="config-label">Timer Mode (40s):</span>
+            <div class="mode-selector">
+                <button class="mode-btn" id="timer-off" onclick="setTimerMode(false)">Off ❌</button>
+                <button class="mode-btn selected" id="timer-on" onclick="setTimerMode(true)">On ⏱️</button>
+            </div>
+        </div>
+        
+        <!-- Player 1 Setup -->
+        <div class="player-setup-box" id="p1-box">
+            <input type="text" id="player1-name" placeholder="Player Name" value="Player 1">
+            <div class="avatar-selector" id="p1-avatars">
+                <span class="avatar-option selected" data-player="1" data-avatar="🦁">🦁</span>
+                <span class="avatar-option" data-player="1" data-avatar="🚀">🚀</span>
+                <span class="avatar-option" data-player="1" data-avatar="🦄">🦄</span>
+                <span class="avatar-option" data-player="1" data-avatar="🦖">🦖</span>
+                <span class="avatar-option" data-player="1" data-avatar="⭐">⭐</span>
+                <span class="avatar-option" data-player="1" data-avatar="🐱">🐱</span>
+                <span class="avatar-option" data-player="1" data-avatar="🤖">🤖</span>
+                <span class="avatar-option" data-player="1" data-avatar="👽">👽</span>
+                <span class="avatar-option" data-player="1" data-avatar="⚽">⚽</span>
+                <span class="avatar-option" data-player="1" data-avatar="🎨">🎨</span>
+            </div>
+        </div>
+
+        <!-- Player 2 Setup -->
+        <div class="player-setup-box" id="p2-box" style="display: none;">
+            <input type="text" id="player2-name" placeholder="Player 2 Name" value="Player 2">
+            <div class="avatar-selector" id="p2-avatars">
+                <span class="avatar-option" data-player="2" data-avatar="🦁">🦁</span>
+                <span class="avatar-option selected" data-player="2" data-avatar="🚀">🚀</span>
+                <span class="avatar-option" data-player="2" data-avatar="🦄">🦄</span>
+                <span class="avatar-option" data-player="2" data-avatar="🦖">🦖</span>
+                <span class="avatar-option" data-player="2" data-avatar="⭐">⭐</span>
+                <span class="avatar-option" data-player="2" data-avatar="🐱">🐱</span>
+                <span class="avatar-option" data-player="2" data-avatar="🤖">🤖</span>
+                <span class="avatar-option" data-player="2" data-avatar="👽">👽</span>
+                <span class="avatar-option" data-player="2" data-avatar="⚽">⚽</span>
+                <span class="avatar-option" data-player="2" data-avatar="🎨">🎨</span>
+            </div>
+        </div>
+
+        <button class="btn-start" id="btn-start-game">Start Game! 🚀</button>
+    </div>
     
-    <div class="stats-bar">
-        <div>Level: <span id="level-display">1</span>/10</div>
-        <div class="score-counter">Score: <span id="score-display">0</span></div>
+    <div class="stats-bar" id="stats-bar">
+        <div>Round: <span id="level-display">1</span>/10</div>
+        <div class="timer-display" id="timer-box">⏱️ <span id="timer-count">30</span>s</div>
+        <div class="scores-container" id="scores-container-view">
+            <div class="score-counter active-player" id="p1-score-box"><span id="p1-icon">🦁</span> <span id="p1-label">Player 1</span>: <span id="p1-score">0</span></div>
+            <div class="score-counter" id="p2-score-box" style="display: none;"><span id="p2-icon">🚀</span> <span id="p2-label">Player 2</span>: <span id="p2-score">0</span></div>
+        </div>
     </div>
 
-    <div class="game-container">
+    <div class="game-container" id="game-container">
         <div class="word-bank" id="word-bank"></div>
         <div class="drop-zone" id="drop-zone"></div>
         <div class="feedback" id="feedback"></div>
 
         <div class="controls">
+            <button class="btn-home" id="btn-home">🏠 Home</button>
             <button class="btn-reset" id="btn-reset">↺ Reset</button>
+            <button class="btn-help" id="btn-help">🔊 Listen Help</button>
+            <button class="btn-skip" id="btn-skip">⏩ Skip</button>
             <button class="btn-check" id="btn-check">✓ Check Answer</button>
             <button class="btn-next" id="btn-next">Next Level ➔</button>
         </div>
     </div>
 
     <script>
-        // Array exacto con las oraciones del nuevo PDF (YEAR 5)
+        // Array exacto con las oraciones de OrderSentences5.html (YEAR 5)[cite: 3]
         const allSentences = [
             // Página 500
             "When's your birthday?", "My birthday is on the 20th of April.", "Where are you from?", 
@@ -216,7 +418,7 @@
             // Página 501
             "What languages do they speak?", "They speak Italian and French", "How many languages does she speak?", 
             "She speaks four languages", "Where is your brother from?", "He is from Morocco", "They are from Russia", 
-            "Are they Japanese? Yes, they are", "What's its typical food?", "Does he like China? Yes, he does", 
+            "Are your parents Japanese?", "What's its typical food?", "Does he like China?", 
             "Where does she live?", "She lives in a flat in London", "What colour is the German flag?", 
             "What's the typical sport of your country?", "British people have lunch at twelve o'clock", 
             "What's the weather like in Sweden?", "What continent is Brazil in?", "What time is in the USA now?", 
@@ -230,13 +432,13 @@
             "I sometimes meet friends at the park at half past six.", 
             "After lunch, I always go to football training.", 
             "My dad hardly ever does gardening.", "We always visit my grandparents on Sunday.", 
-            "In the evening, my brother sometimes goes to the cinema with his friends.", 
+            "My brother sometimes goes to the cinema with his friends.", 
             "After breakfast, my parents do the shopping.", "At the weekend, I like using internet.", 
             "In the morning, my sister practises the keyboard for an hour.", "He always has dinner at eight o'clock.", 
             "You hardly ever do baking at the weekend.", "My cousins never have lunch with their parents.", 
             "We usually ride our bikes on Sunday morning.", 
             "My uncle never watches TV at night.", 
-            "How often do you go to training?", "How often do you watch TV? Twice a week.", 
+            "How often do you go to training?", "How often do you watch TV?", 
             "I walk the dog four times a week", "On Sunday, I hardly ever get up early.", 
             "She goes basketball training three times a week.",
 
@@ -269,7 +471,7 @@
             "Jerboas have got four legs and a tail.",
 
             // Página 505
-            "My mother was good at Music", "Peter was a scary teacher.", "Were you good at Maths? No, I wasn't", 
+            "My mother was good at Music", "Peter was a scary teacher.", "Were you good at Maths?", 
             "I was good at singing and playing the guitar.", 
             "She wasn't good at Science or Maths.", 
             "Joel was bad at English and Art.", "Science lessons were difficult for me.", 
@@ -299,22 +501,144 @@
             "Did he play computer games last weekend?", "My brother didn't talk to me yesterday."
         ];
         
+        for (let i = 0; i < allSentences.length; i++) {
+            let text = allSentences[i].trim();
+            if (!/[.?!]$/.test(text)) {
+                text += ".";
+            }
+            allSentences[i] = text;
+        }
+
         const pastelColors = ['#ffb3ba', '#ffdfba', '#ffffba', '#baffc9', '#bae1ff', '#e8b9ff', '#ffd1dc'];
         
+        let totalPlayers = 1;
+        let timerEnabled = true;
         let currentSessionSentences = [];
-        let currentLevel = 0;
-        let score = 0;
+        let currentRound = 0;
+        let activePlayer = 1;
+        let scores = { 1: 0, 2: 0 };
+        let playerNames = { 1: "Player 1", 2: "Player 2" };
+        let playerIcons = { 1: "🦁", 2: "🚀" };
         let wordsData = []; 
         let animationFrameId;
+        
+        let helpUsedInCurrentRound = false;
+        let timeLeft = 40;
+        let timerInterval = null;
 
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'success') {
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(330, now);
+                oscillator.frequency.setValueAtTime(392, now + 0.1);
+                oscillator.frequency.setValueAtTime(523.25, now + 0.2);
+                
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                
+                oscillator.start(now);
+                oscillator.stop(now + 0.4);
+            } else if (type === 'error') {
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(180, now);
+                oscillator.frequency.setValueAtTime(120, now + 0.15);
+                
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                
+                oscillator.start(now);
+                oscillator.stop(now + 0.3);
+            } else if (type === 'skip') {
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(300, now);
+                oscillator.frequency.setValueAtTime(400, now + 0.1);
+                
+                gainNode.gain.setValueAtTime(0.15, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                
+                oscillator.start(now);
+                oscillator.stop(now + 0.2);
+            }
+        }
+
+        const setupScreen = document.getElementById('setup-screen');
+        const gameContainer = document.getElementById('game-container');
+        const statsBar = document.getElementById('stats-bar');
+        const timerBox = document.getElementById('timer-box');
+        const timerCountSpan = document.getElementById('timer-count');
+        
         const wordBank = document.getElementById('word-bank');
         const dropZone = document.getElementById('drop-zone');
         const feedback = document.getElementById('feedback');
         const btnCheck = document.getElementById('btn-check');
         const btnReset = document.getElementById('btn-reset');
+        const btnSkip = document.getElementById('btn-skip');
+        const btnHelp = document.getElementById('btn-help');
+        const btnHome = document.getElementById('btn-home');
         const btnNext = document.getElementById('btn-next');
+        const btnStartGame = document.getElementById('btn-start-game');
+        
         const levelDisplay = document.getElementById('level-display');
-        const scoreDisplay = document.getElementById('score-display');
+        const p1Label = document.getElementById('p1-label');
+        const p2Label = document.getElementById('p2-label');
+        const p1Icon = document.getElementById('p1-icon');
+        const p2Icon = document.getElementById('p2-icon');
+        const p1Score = document.getElementById('p1-score');
+        const p2Score = document.getElementById('p2-score');
+        const p1ScoreBox = document.getElementById('p1-score-box');
+        const p2ScoreBox = document.getElementById('p2-score-box');
+
+        function setGameMode(num) {
+            totalPlayers = num;
+            if (num === 1) {
+                document.getElementById('mode-single').classList.add('selected');
+                document.getElementById('mode-multi').classList.remove('selected');
+                document.getElementById('p2-box').style.display = 'none';
+                document.getElementById('player1-name').placeholder = "Player Name";
+            } else {
+                document.getElementById('mode-multi').classList.add('selected');
+                document.getElementById('mode-single').classList.remove('selected');
+                document.getElementById('p2-box').style.display = 'flex';
+                document.getElementById('player1-name').placeholder = "Player 1 Name";
+            }
+        }
+
+        function setTimerMode(status) {
+            timerEnabled = status;
+            if (status) {
+                document.getElementById('timer-on').classList.add('selected');
+                document.getElementById('timer-off').classList.remove('selected');
+            } else {
+                document.getElementById('timer-off').classList.add('selected');
+                document.getElementById('timer-on').classList.remove('selected');
+            }
+        }
+
+        document.querySelectorAll('.avatar-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                const playerNum = e.target.dataset.player;
+                const selectedAvatar = e.target.dataset.avatar;
+                
+                document.querySelectorAll(`.avatar-option[data-player="${playerNum}"]`).forEach(el => {
+                    el.classList.remove('selected');
+                });
+                
+                e.target.classList.add('selected');
+                playerIcons[playerNum] = selectedAvatar;
+            });
+        });
 
         function shuffleArray(array) {
             let currentIndex = array.length, randomIndex;
@@ -326,31 +650,118 @@
             return array;
         }
 
+        btnStartGame.addEventListener('click', () => {
+            const p1Input = document.getElementById('player1-name').value.trim();
+            const p2Input = document.getElementById('player2-name').value.trim();
+            
+            if (p1Input) playerNames[1] = p1Input;
+            if (p2Input) playerNames[2] = p2Input;
+
+            p1Label.innerText = playerNames[1];
+            p1Icon.innerText = playerIcons[1];
+            p1ScoreBox.style.display = 'flex';
+
+            if (totalPlayers === 2) {
+                p2Label.innerText = playerNames[2];
+                p2Icon.innerText = playerIcons[2];
+                p2ScoreBox.style.display = 'flex';
+            } else {
+                p2ScoreBox.style.display = 'none';
+            }
+
+            if (timerEnabled) {
+                timerBox.style.display = 'block';
+            } else {
+                timerBox.style.display = 'none';
+            }
+
+            setupScreen.style.display = 'none';
+            gameContainer.style.display = 'flex';
+            statsBar.style.display = 'flex';
+
+            startNewGame();
+        });
+
+        btnHome.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            gameContainer.style.display = 'none';
+            statsBar.style.display = 'none';
+            setupScreen.style.display = 'flex';
+            
+            const replayBtn = document.getElementById('btn-replay');
+            if (replayBtn) replayBtn.remove();
+        });
+
         function startNewGame() {
             const shuffled = shuffleArray([...allSentences]);
             currentSessionSentences = shuffled.slice(0, 10);
             
-            currentLevel = 0;
-            score = 0;
-            scoreDisplay.innerText = score;
+            currentRound = 0;
+            activePlayer = 1;
+            scores = { 1: 0, 2: 0 };
+            
+            p1Score.innerText = scores[1];
+            p2Score.innerText = scores[2];
             
             const replayBtn = document.getElementById('btn-replay');
             if (replayBtn) replayBtn.remove();
 
             btnReset.style.display = 'inline-block';
+            btnSkip.style.display = 'inline-block';
+            btnHelp.style.display = 'inline-block';
+            updateTurnDisplay();
             initLevel();
+        }
+
+        function updateTurnDisplay() {
+            if (activePlayer === 1) {
+                p1ScoreBox.classList.add('active-player');
+                p2ScoreBox.classList.remove('active-player');
+            } else {
+                p2ScoreBox.classList.add('active-player');
+                p1ScoreBox.classList.remove('active-player');
+            }
+        }
+
+        function startTimer() {
+            if (!timerEnabled) return;
+            clearInterval(timerInterval);
+            timeLeft = 40;
+            timerCountSpan.innerText = timeLeft;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerCountSpan.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    playSound('error');
+                    feedback.innerText = "⏰ Time's up! Moving to next round.";
+                    feedback.style.color = "#d32f2f";
+                    btnCheck.style.display = 'none';
+                    btnSkip.style.display = 'none';
+                    btnHelp.style.display = 'none';
+                    btnNext.style.display = 'inline-block';
+                }
+            }, 1000);
         }
 
         function initLevel() {
             wordBank.innerHTML = '';
             dropZone.innerHTML = '';
             feedback.innerText = '';
+            helpUsedInCurrentRound = false;
             btnNext.style.display = 'none';
             btnCheck.style.display = 'inline-block';
-            levelDisplay.innerText = currentLevel + 1;
+            btnSkip.style.display = 'inline-block';
+            btnHelp.style.display = 'inline-block';
+            levelDisplay.innerText = currentRound + 1;
             wordsData = [];
 
-            const sentence = currentSessionSentences[currentLevel];
+            const sentence = currentSessionSentences[currentRound];
             const words = sentence.split(' ').sort(() => Math.random() - 0.5);
 
             const bankRect = wordBank.getBoundingClientRect();
@@ -386,6 +797,8 @@
             if (!animationFrameId) {
                 animate();
             }
+
+            startTimer();
         }
 
         function animate() {
@@ -399,22 +812,10 @@
                 w.x += w.vx;
                 w.y += w.vy;
 
-                if (w.x <= 0) { 
-                    w.x = 0; 
-                    w.vx = Math.abs(w.vx); 
-                }
-                if (w.y <= 0) { 
-                    w.y = 0; 
-                    w.vy = Math.abs(w.vy); 
-                }
-                if (w.x + w.width >= bankRect.width) { 
-                    w.x = Math.max(0, bankRect.width - w.width); 
-                    w.vx = -Math.abs(w.vx); 
-                }
-                if (w.y + w.height >= bankRect.height) { 
-                    w.y = Math.max(0, bankRect.height - w.height); 
-                    w.vy = -Math.abs(w.vy); 
-                }
+                if (w.x <= 0) { w.x = 0; w.vx = Math.abs(w.vx); }
+                if (w.y <= 0) { w.y = 0; w.vy = Math.abs(w.vy); }
+                if (w.x + w.width >= bankRect.width) { w.x = Math.max(0, bankRect.width - w.width); w.vx = -Math.abs(w.vx); }
+                if (w.y + w.height >= bankRect.height) { w.y = Math.max(0, bankRect.height - w.height); w.vy = -Math.abs(w.vy); }
 
                 w.el.style.transform = `translate(${w.x}px, ${w.y}px)`;
             });
@@ -424,16 +825,13 @@
 
         function handleWordClick(e) {
             const el = e.target;
-            
             if (el.parentElement === wordBank) {
                 dropZone.appendChild(el);
                 el.className = 'word-card in-drop-zone';
                 el.style.transform = 'none';
-            } 
-            else if (el.parentElement === dropZone) {
+            } else if (el.parentElement === dropZone) {
                 wordBank.appendChild(el);
                 el.className = 'word-card in-bank';
-                
                 const data = wordsData.find(w => w.id === el.id);
                 if (data) {
                     const bankRect = wordBank.getBoundingClientRect();
@@ -466,10 +864,8 @@
         dropZone.addEventListener('drop', e => {
             e.preventDefault();
             dropZone.classList.remove('drag-over');
-            
             const id = e.dataTransfer.getData('text/plain');
             const el = document.getElementById(id);
-            
             if (el) {
                 const afterElement = getDragAfterElement(dropZone, e.clientX);
                 if (afterElement == null) {
@@ -477,25 +873,19 @@
                 } else {
                     dropZone.insertBefore(el, afterElement);
                 }
-
                 el.className = 'word-card in-drop-zone';
                 el.style.transform = 'none';
             }
         });
 
-        wordBank.addEventListener('dragover', e => {
-            e.preventDefault();
-        });
-
+        wordBank.addEventListener('dragover', e => e.preventDefault());
         wordBank.addEventListener('drop', e => {
             e.preventDefault();
             const id = e.dataTransfer.getData('text/plain');
             const el = document.getElementById(id);
-            
             if (el && el.parentElement !== wordBank) {
                 wordBank.appendChild(el);
                 el.className = 'word-card in-bank';
-                
                 const data = wordsData.find(w => w.id === id);
                 if (data) {
                     const rect = wordBank.getBoundingClientRect();
@@ -518,24 +908,62 @@
             }, { offset: Number.NEGATIVE_INFINITY }).element;
         }
 
+        btnHelp.addEventListener('click', () => {
+            if ('speechSynthesis' in window) {
+                helpUsedInCurrentRound = true;
+                const sentenceToRead = currentSessionSentences[currentRound];
+                const utterance = new SpeechSynthesisUtterance(sentenceToRead);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                window.speechSynthesis.speak(utterance);
+                feedback.innerText = "🔊 Listening to help! (Points will be halved)";
+                feedback.style.color = "#f57f17";
+            } else {
+                alert("Text-to-speech is not supported in your browser.");
+            }
+        });
+
         btnCheck.addEventListener('click', () => {
             const droppedWords = Array.from(dropZone.querySelectorAll('.word-card'));
             const currentAnswer = droppedWords.map(w => w.innerText).join(' ');
-            const correctAnswer = currentSessionSentences[currentLevel];
+            const correctAnswer = currentSessionSentences[currentRound];
 
             if (currentAnswer === correctAnswer) {
-                feedback.innerText = "🌟 Great Job! That's correct! 🌟";
+                clearInterval(timerInterval);
+                playSound('success');
+                const displayName = totalPlayers === 2 ? playerNames[activePlayer] : "Great Job!";
+                
+                let roundPoints = helpUsedInCurrentRound ? 5 : 10;
+                scores[activePlayer] += roundPoints;
+
+                if (activePlayer === 1) p1Score.innerText = scores[1];
+                else p2Score.innerText = scores[2];
+
+                let helpTextMsg = helpUsedInCurrentRound ? " (Half points due to help!)" : "";
+                feedback.innerText = `🌟 Awesome, ${displayName}! Correct! +${roundPoints}pts${helpTextMsg} 🌟`;
                 feedback.style.color = "#2e7d32";
                 
-                score += 10;
-                scoreDisplay.innerText = score;
-                
                 btnCheck.style.display = 'none';
+                btnSkip.style.display = 'none';
+                btnHelp.style.display = 'none';
                 btnNext.style.display = 'inline-block';
             } else {
-                feedback.innerText = "Oops! That's not quite right. Try again!";
+                playSound('error');
+                feedback.innerText = "Oops! That's not quite right. Try again, use Help, or Skip!";
                 feedback.style.color = "#d32f2f";
             }
+        });
+
+        btnSkip.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            playSound('skip');
+            feedback.innerText = `Skipped! Correct sentence was: "${currentSessionSentences[currentRound]}"`;
+            feedback.style.color = "#e65100";
+            
+            btnCheck.style.display = 'none';
+            btnSkip.style.display = 'none';
+            btnHelp.style.display = 'none';
+            btnNext.style.display = 'inline-block';
         });
 
         btnReset.addEventListener('click', () => {
@@ -543,7 +971,6 @@
                 if (w.el.parentElement !== wordBank) {
                     wordBank.appendChild(w.el);
                     w.el.className = 'word-card in-bank';
-                    
                     const bankRect = wordBank.getBoundingClientRect();
                     w.x = (bankRect.width / 2) - (w.width / 2);
                     w.y = (bankRect.height / 2) - (w.height / 2);
@@ -553,22 +980,44 @@
         });
 
         btnNext.addEventListener('click', () => {
-            currentLevel++;
-            if (currentLevel < currentSessionSentences.length) {
+            currentRound++;
+            if (totalPlayers === 2) {
+                activePlayer = activePlayer === 1 ? 2 : 1;
+                updateTurnDisplay();
+            }
+
+            if (currentRound < currentSessionSentences.length) {
                 initLevel();
             } else {
                 wordBank.innerHTML = '';
                 dropZone.innerHTML = '';
-                feedback.innerText = "🎉 You completed all 10 levels! 🎉";
+                timerBox.style.display = 'none';
+                
+                let winText = "";
+                if (totalPlayers === 2) {
+                    if (scores[1] > scores[2]) {
+                        winText = `🏆🎉 ${playerIcons[1]} ${playerNames[1]} Wins with ${scores[1]} pts! 🎉🏆`;
+                    } else if (scores[2] > scores[1]) {
+                        winText = `🏆🎉 ${playerIcons[2]} ${playerNames[2]} Wins with ${scores[2]} pts! 🎉🏆`;
+                    } else {
+                        winText = `🤝 It's a Tie! Both scored ${scores[1]} pts! 🤝`;
+                    }
+                } else {
+                    winText = `🎉 Congratulations! Final Score: ${scores[1]} pts! 🎉`;
+                }
+
+                feedback.innerText = winText;
                 feedback.style.color = "#ff4081";
                 btnNext.style.display = 'none';
                 btnCheck.style.display = 'none';
                 btnReset.style.display = 'none';
+                btnSkip.style.display = 'none';
+                btnHelp.style.display = 'none';
                 
                 const replayBtn = document.createElement('button');
                 replayBtn.className = 'btn-check';
                 replayBtn.id = 'btn-replay';
-                replayBtn.innerText = 'Play Again';
+                replayBtn.innerText = 'Play Again 🔄';
                 replayBtn.onclick = startNewGame;
                 
                 document.querySelector('.controls').appendChild(replayBtn);
@@ -582,8 +1031,6 @@
                 if (w.y + w.height > bankRect.height) w.y = Math.max(0, bankRect.height - w.height);
             });
         });
-
-        startNewGame();
     </script>
 </body>
 </html>
